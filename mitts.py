@@ -2,6 +2,7 @@ from species import Species
 from bowtie import BowtieRunner
 import pysam
 import pysamstats
+import argparse
 
 
 VERSION = '0.0.1'
@@ -24,7 +25,7 @@ def main():
 
     args=set_parser()
     species = Species(args.species)
-    bt_runner = BowtieRunner(reference=species.bowtie, fastq1=args.fastq1, fastq2=args.fastq2, threads=args.threads)
+    bt_runner = BowtieRunner(bowtie_ref=species.bowtie_ref, reference=species.reference, fastq1=args.fastq1, fastq2=args.fastq2, threads=args.threads)
     bam_file = bt_runner.run_bowtie()
     bam = pysam.AlignmentFile(bam_file)
 
@@ -35,21 +36,21 @@ def main():
         # To truncate output to exactly the selected region, provide a truncate=True keyword argument.
         # opt.iter_pileup (pysamstats): one record is generated for each genome position in the selected range, based on a pileup column.
         # This should always run exactly once
-        for rec in pysamstats.stat_variation(bam, chrom=species.chrom, fafile=species.reference, start=position, end=position, truncate=True):
+        for rec in pysamstats.stat_variation(bam, chrom=species.chrom, fafile=species.reference, start=position-1, end=position, truncate=True):
             # only check the one mutation that has been provided, not others
             # Only consider properly paired reads ('_pp' suffix)
             pos, ref, reads, mutation = rec['pos'], rec['ref'], rec['reads_pp'], rec[species.variant_nucls[idx] + '_pp']
             
             assert ref == species.reference_nucls[idx]
 
-            if reads < args.mincov:
-                msg(f'Coverage at position of potential point mutation {species.mutations[idx]} is ({reads}), smaller than the minimum coverage specified ({args.mincov}). Skipping.')
+            if reads < int(args.mincov):
+                print(f'Coverage at position of potential point mutation {species.mutations[idx]} is ({reads}), smaller than the minimum coverage specified ({args.mincov}). Skipping.')
             else:
                 perc_at_mutation_position = mutation/reads*100
-                percentages =  {x:100/species.copy_number*x for x in range(0,copy_number+1)}
+                percentages =  {x:100/species.copy_number*x for x in range(0,species.copy_number+1)}
                 copies_with_mutation, closest_perc = min(percentages.items(), key = lambda x: abs(x[1]-perc_at_mutation_position))
                 #  = [count for count, perc in percentages.items() if perc == closest_perc].pop()
-                print(f'An estimated {copies_with_mutation} out of {species.copy_number} 23S copies have mutation {species.mutations[idx]} ({mutation} / {reads}, {perc_at_mutation_position:.2%}).')
+                print(f'An estimated {copies_with_mutation} out of {species.copy_number} 23S copies have mutation {species.mutations[idx]} ({mutation} / {reads}, {perc_at_mutation_position:.2f}%).')
 
 
 if __name__ == "__main__":
