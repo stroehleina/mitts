@@ -5,7 +5,7 @@ def _check_executable(executable):
 	try:
 	    which = run(['which', executable], capture_output=True, text=True, check=True)
 	    path = which.stdout.strip()
-	    print(f'{executable} executable found in {path}')
+	    # print(f'{executable} executable found in {path}')
 	    return path
 	except CalledProcessError as e:
 	    print(f'Could not find {executable} executable. Check {executable} is installed correctly and in $PATH.')
@@ -16,7 +16,7 @@ def _check_executable(executable):
 class BowtieRunner:
 	'''A class that implements a bowtie2 run and does some simple checking of executables'''
 
-	def __init__(self, bowtie_ref, reference, fastq1, fastq2, threads):
+	def __init__(self, bowtie_ref, reference, fastq1, fastq2, threads, bamout):
 		self.path = _check_executable('bowtie2')
 		self.sampath = _check_executable('samtools')
 		self.bowtie_ref = bowtie_ref
@@ -24,16 +24,20 @@ class BowtieRunner:
 		self.fastq1 = fastq1
 		self.fastq2 = fastq2
 		self.threads = threads
+		self.bamout = bamout
 		self.bam_file = self._create_output_filename()
 
 	def _create_output_filename(self):
 		'''Create a .bam file name based on the longest common string match between fastq1 and fastq2'''
+		if self.bamout:
+			return self.bamout + '.bam'
 
-		for pos, _ in enumerate(self.fastq1):
+		for pos in range(len(self.fastq1)):
 			if self.fastq1[pos] != self.fastq2[pos]:
+				# If there is no common prefix between two fastq files
 				if not self.fastq1[:pos]:
-					print(f'Creating output file MITTS_out.bam')
-					return 'MITTS_out.bam'
+					print(f'FASTQ files do not have a common prefix and none was provided via --output parameter. Creating default output file mitts_out.bam')
+					return 'mitts_out.bam'
 				print(f'Creating output file {self.fastq1[:pos] + ".bam"}')
 				return self.fastq1[:pos] + '.bam'
 

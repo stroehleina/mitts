@@ -15,10 +15,14 @@ class Species:
 		},
 
 		'NEISSERIA' : {
-			'reference' : '/home/astroehlein/resources/23S/Ngono_23S_wildtype.fa',
-			'chrom' : '23S_100',
+			# 'reference' : '/home/astroehlein/resources/23S/Ngono_23S_wildtype.fa',
+			'reference' : '/home/astroehlein/resources/23S/NR_103957.1_FA_1090_23S.fa',
+			# 'chrom' : '23S_100',
+			'chrom' : 'NR_103957.1_FA_1090_23S',
+			# 'bowtie_ref' : '/home/astroehlein/resources/23S/bt_Ngono',
 			'bowtie_ref' : '/home/astroehlein/resources/23S/bt_Ngono',
-			'positions' : [9, 561],
+			'positions' : [2062, 2617],
+			# 'positions' : [9, 561],
 			'reference_nucls' : ['A', 'C'],
 			'variant_nucls' : ['G', 'T'],
 			'mutations' : ['A2059G', 'C2611T'],
