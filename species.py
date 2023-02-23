@@ -28,6 +28,11 @@ class Species:
 			'mutations' : ['A2059G', 'C2611T'],
 			'copy_number' : 4
 		}
+
+
+		# ADD YOUR OWN SPECIES HERE
+		# DON'T FORGET THE COMMA AFTER THE LAST DICT ENTRY :)
+
 	}
 
 	def __init__(self, species):
