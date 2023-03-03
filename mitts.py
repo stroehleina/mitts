@@ -45,7 +45,7 @@ def main():
             assert ref == species.reference_nucls[idx]
 
             if reads < int(args.mincov):
-                print(f'WARNING: Coverage at position of potential point mutation {species.mutations[idx]} for {args.output} is ({reads}), smaller than the minimum coverage specified ({args.mincov}). Skipping.')
+                print(f'WARNING: Coverage at position of potential point mutation {species.mutations[idx]} for {args.output} ({reads}) is smaller than the minimum coverage specified ({args.mincov}). Skipping.')
             else:
                 perc_at_mutation_position = mutation/reads*100
                 percentages =  {x:100/species.copy_number*x for x in range(0,species.copy_number+1)}
